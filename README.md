@@ -149,15 +149,13 @@ Follow these literal steps to deploy the application on **Render.com** for your 
    * `SECRET_KEY`: `<generate-a-long-random-string>`
    * `JWT_SECRET_KEY`: `<generate-another-long-random-string>`
    * `FRONTEND_URL`: `https://your-frontend-subdomain.onrender.com` (you will update this with your frontend URL once created).
-5. **Attach Persistent Storage (For SQLite database & image uploads)**:
-   * Scroll down to **Disks** (Volumes) and click **Add Disk**.
-   * **Name**: `jaggery_data`
-   * **Mount Path**: `/data`
-   * **Size**: `1 GiB` (more than enough for start)
-   * Under **Environment Variables**, add:
-     * `DB_PATH`: `/data/jaggery.db`
-     * `UPLOAD_FOLDER`: `/data/uploads`
-   * *Note*: This disk acts as a virtual hard drive so your settings, manager photos, and orders are never deleted when the server restarts!
+5. **Setup a Free Database on Neon.tech (Crucial for 100% Free Persistent Storage)**:
+   * Go to **[Neon.tech](https://neon.tech/)** and sign up for a free account (no credit card required).
+   * Click **Create Project**, name it `khagraj`, and choose the nearest region.
+   * Under **Dashboard**, copy your connection string (looks like `postgresql://alex:password@ep-cool-water-1234.us-east-2.neon.tech/neondb?sslmode=require`).
+   * Back in your Render Web Service dashboard, add a new **Environment Variable**:
+     * `DATABASE_URL`: `<paste-your-neon-connection-string>`
+   * *Why this is needed*: Since Render's free tier does not support persistent disks, any local SQLite file gets erased every 15 minutes. Using Neon.tech ensures your orders, user accounts, and settings are saved forever, completely free!
 6. Click **Create Web Service**. Wait for it to build. Note down the backend URL (e.g. `https://khagraj-backend.onrender.com`).
 
 ---
@@ -192,13 +190,11 @@ Once both builds finish, your website will be live! Open your frontend URL to ac
 
 ---
 
-### **💡 Alternative: Using PostgreSQL (Recommended for Production scaling)**
-If you want to use a relational database instead of SQLite:
-1. Go to **Render Dashboard** > **New +** > **PostgreSQL**.
-2. Create the database. Copy the **Internal Database URL** from the database settings page.
-3. Go back to your Backend Web Service settings, add a new environment variable:
-   * `DATABASE_URL`: `<paste-your-postgresql-url-here>`
-4. Save changes. The backend will automatically rebuild, detect the PostgreSQL connection, migrate the schema, and run on the cloud database! (You won't need to configure a Disk/Volume for SQLite if you do this).
+### **🖼️ Handling Image Uploads for Free (logo/photos/products)**
+Since Render's free tier has an **ephemeral filesystem** (any uploaded files are wiped out when the server sleeps or restarts), follow this approach to keep your site completely free:
+* Instead of uploading raw files in the admin panel, upload your brand logos, manager photos, and product images to a free image hosting service (such as **[ImgBB](https://imgbb.com/)** or **[PostImages](https://postimages.org/)**).
+* Copy the **Direct Link** to the image (ending in `.png`, `.jpg`, or `.webp`).
+* Paste this URL directly into the product image fields or admin site settings inside your admin dashboard. This avoids needing storage disks completely!
 
 ---
 

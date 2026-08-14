@@ -11,7 +11,7 @@ import re
 from flask import Blueprint, request, jsonify, current_app
 from flask_jwt_extended import create_access_token, get_jwt_identity, verify_jwt_in_request
 
-from extensions import db, cache
+from extensions import db, cache, safe_cache_clear
 from models.models import User, Product, Order, OrderStatusHistory, SiteSetting, ContactMessage
 from routers import require_auth, optional_auth, get_current_user
 
@@ -205,7 +205,7 @@ def place_order():
     db.session.commit()
 
     # Invalidate product cache
-    cache.clear()
+    safe_cache_clear()
 
     # Send confirmation email (async via Celery)
     try:

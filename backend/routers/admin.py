@@ -15,7 +15,7 @@ from flask import Blueprint, request, jsonify, current_app, send_from_directory
 from flask_jwt_extended import get_jwt_identity
 from sqlalchemy import func
 
-from extensions import db, cache
+from extensions import db, cache, safe_cache_clear
 from models.models import (
     User, Product, Order, OrderStatusHistory, SiteSetting, ContactMessage, ORDER_STATUSES
 )
@@ -126,7 +126,7 @@ def add_product():
     )
     db.session.add(p)
     db.session.commit()
-    cache.clear()
+    safe_cache_clear()
     return jsonify(p.to_dict()), 201
 
 
@@ -155,7 +155,7 @@ def update_product(pid):
         p.image_url = data["image_url"]
 
     db.session.commit()
-    cache.clear()
+    safe_cache_clear()
     return jsonify(p.to_dict())
 
 
@@ -165,7 +165,7 @@ def delete_product(pid):
     p = Product.query.get_or_404(pid)
     p.active = False          # soft delete
     db.session.commit()
-    cache.clear()
+    safe_cache_clear()
     return jsonify({"success": True})
 
 
@@ -311,7 +311,7 @@ def update_settings():
     data = request.get_json() or {}
     for key, value in data.items():
         SiteSetting.set(key, str(value))
-    cache.clear()
+    safe_cache_clear()
     return jsonify({"success": True, "settings": SiteSetting.all_as_dict()})
 
 
@@ -332,7 +332,7 @@ def upload_logo():
 
     url = f"/uploads/{filename}"
     SiteSetting.set("site_logo", url)
-    cache.clear()
+    safe_cache_clear()
     return jsonify({"url": url})
 
 

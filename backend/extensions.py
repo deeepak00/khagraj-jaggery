@@ -15,6 +15,13 @@ mail = Mail()
 cache = Cache()
 cors  = CORS()
 
+def safe_cache_clear():
+    try:
+        cache.clear()
+    except Exception as e:
+        import logging
+        logging.warning(f"Cache clear skipped/failed (likely Redis connection unavailable): {e}")
+
 # Celery instance – fully configured in init_celery()
 celery = Celery(__name__)
 
