@@ -32,9 +32,18 @@ def init_extensions(app):
     jwt.init_app(app)
     mail.init_app(app)
     cache.init_app(app)
+    frontend_url = app.config.get("FRONTEND_URL", "")
+    origins = []
+    if frontend_url:
+        origins.append(frontend_url)
+        origins.append(frontend_url.rstrip("/"))
+        origins.append(frontend_url.rstrip("/") + "/")
+    else:
+        origins = ["http://localhost:5173"]
+
     cors.init_app(
         app,
-        resources={r"/api/*": {"origins": app.config["FRONTEND_URL"]}},
+        resources={r"/api/*": {"origins": origins}},
         supports_credentials=True,
     )
     _init_celery(app)
