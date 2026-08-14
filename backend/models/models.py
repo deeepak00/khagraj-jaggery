@@ -240,6 +240,17 @@ class SiteSetting(db.Model):
         db.session.commit()
 
     @classmethod
+    def set_many(cls, data: dict):
+        for key, value in data.items():
+            row = cls.query.filter_by(key=key).first()
+            if row:
+                row.value = str(value)
+                row.updated_at = datetime.utcnow()
+            else:
+                db.session.add(cls(key=key, value=str(value)))
+        db.session.commit()
+
+    @classmethod
     def all_as_dict(cls) -> dict:
         return {r.key: r.value for r in cls.query.all()}
 

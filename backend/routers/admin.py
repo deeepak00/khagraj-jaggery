@@ -309,8 +309,7 @@ def get_settings():
 @require_admin
 def update_settings():
     data = request.get_json() or {}
-    for key, value in data.items():
-        SiteSetting.set(key, str(value))
+    SiteSetting.set_many(data)
     safe_cache_clear()
     return jsonify({"success": True, "settings": SiteSetting.all_as_dict()})
 

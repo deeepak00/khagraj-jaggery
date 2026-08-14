@@ -1,4 +1,4 @@
-# KhagRaj Jaggery — E-commerce App
+# GurMahima — Jaggery E-commerce App
 
 Full-stack app: **Flask** (REST API) + **Vue 3 / Vite / Pinia** (frontend).
 
