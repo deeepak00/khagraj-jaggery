@@ -167,8 +167,6 @@ def _seed(app: Flask):
         row = SiteSetting.query.filter_by(key=key).first()
         if not row:
             db.session.add(SiteSetting(key=key, value=value))
-        elif key in ("site_logo", "contact_phone", "contact_email", "whatsapp_number", "manager_lalji_name", "manager_lalji_role", "manager_lalji_bio", "manager_awadhesh_name", "manager_awadhesh_role", "manager_awadhesh_bio", "manager_arjun_name", "manager_arjun_role", "manager_arjun_bio", "branches_info", "shipping_free_threshold", "shipping_base_fee", "seasonal_discount_percent", "testimonial_1_name", "testimonial_1_role", "testimonial_1_text", "testimonial_1_photo", "testimonial_2_name", "testimonial_2_role", "testimonial_2_text", "testimonial_2_photo", "testimonial_3_name", "testimonial_3_role", "testimonial_3_text", "testimonial_3_photo"):
-            row.value = value
 
     # Sample products
     if Product.query.count() == 0:
