@@ -415,10 +415,44 @@ async function save() {
 }
 
 
+function compressImage(file, maxWidth = 1024, maxHeight = 1024, quality = 0.8) {
+  return new Promise((resolve) => {
+    if (!file.type.startsWith('image/')) return resolve(file)
+    const reader = new FileReader()
+    reader.onload = (e) => {
+      const img = new Image()
+      img.onload = () => {
+        let w = img.width
+        let h = img.height
+        if (w > h) {
+          if (w > maxWidth) { h = Math.round((h * maxWidth) / w); w = maxWidth }
+        } else {
+          if (h > maxHeight) { w = Math.round((w * maxHeight) / h); h = maxHeight }
+        }
+        const canvas = document.createElement('canvas')
+        canvas.width = w
+        canvas.height = h
+        const ctx = canvas.getContext('2d')
+        ctx.drawImage(img, 0, 0, w, h)
+        canvas.toBlob((blob) => {
+          if (!blob) return resolve(file)
+          const name = file.name.substring(0, file.name.lastIndexOf('.')) || 'image'
+          resolve(new File([blob], name + '.jpg', { type: 'image/jpeg', lastModified: Date.now() }))
+        }, 'image/jpeg', quality)
+      }
+      img.onerror = () => resolve(file)
+      img.src = e.target.result
+    }
+    reader.onerror = () => resolve(file)
+    reader.readAsDataURL(file)
+  })
+}
+
 async function uploadManagerPhoto(e, fieldName) {
-  const file = e.target.files[0]; if (!file) return
-  toast.info('Uploading photo...')
+  const rawFile = e.target.files[0]; if (!rawFile) return
+  toast.info('Processing and uploading photo...')
   try {
+    const file = await compressImage(rawFile)
     const fd = new FormData(); fd.append('file', file)
     const { data } = await adminApi.uploadImage(fd)
     form.value[fieldName] = data.url

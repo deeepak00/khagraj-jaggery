@@ -3,7 +3,7 @@ import { ref } from 'vue'
 import { settingsApi } from '@/api'
 
 export const useSiteStore = defineStore('site', () => {
-  const settings = ref({
+  const defaultSettings = {
     site_name:           'KhagRaj',
     site_tagline:        'Pure Jaggery, Ancient Goodness — An Initiative by Lal Ji Foods',
     site_logo:           '/uploads/logo.png',
@@ -13,7 +13,7 @@ export const useSiteStore = defineStore('site', () => {
     about_text:          'KhagRaj was born from a simple belief — that the sweetness of jaggery should never come at the cost of purity. An initiative by Lal Ji Foods, we source fresh sugarcane from local farms and produce jaggery in open iron vessels the old-fashioned way.',
     contact_phone:       '+91-6394050508, +91-8601982296',
     contact_email:       'khagrajindia2017@gmail.com',
-    contact_address:     'KhagRaj Production House, Maharashtra, India',
+    contact_address:     'KhagRaj Production House, Uttar Pradesh, India',
     working_hours:       'Mon–Sat, 9:00 AM – 6:00 PM',
     whatsapp_number:     '916394050508',
     facebook_url:        '',
@@ -39,14 +39,29 @@ export const useSiteStore = defineStore('site', () => {
     testimonial_1_name: '', testimonial_1_role: '', testimonial_1_text: '', testimonial_1_photo: '',
     testimonial_2_name: '', testimonial_2_role: '', testimonial_2_text: '', testimonial_2_photo: '',
     testimonial_3_name: '', testimonial_3_role: '', testimonial_3_text: '', testimonial_3_photo: '',
-  })
+  }
 
+  // Load from localStorage if present to ensure instantaneous rendering
+  let initial = { ...defaultSettings }
+  try {
+    const cached = localStorage.getItem('khagraj_site_settings')
+    if (cached) {
+      initial = { ...defaultSettings, ...JSON.parse(cached) }
+    }
+  } catch (e) {
+    console.error('Failed to parse cached site settings:', e)
+  }
+
+  const settings = ref(initial)
 
   async function fetchPublic() {
     try {
       const { data } = await settingsApi.public()
       settings.value = { ...settings.value, ...data }
-    } catch { /* use defaults */ }
+      localStorage.setItem('khagraj_site_settings', JSON.stringify(settings.value))
+    } catch (e) {
+      console.warn('Failed to fetch public settings, using cached/default values.', e)
+    }
   }
 
   function get(key, fallback = '') {
