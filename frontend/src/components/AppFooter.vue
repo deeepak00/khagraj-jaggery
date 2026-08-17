@@ -1,7 +1,7 @@
 <template>
   <footer style="background:var(--brown);color:var(--cream);padding:60px 0 0">
     <div class="container">
-      <div style="display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:60px;margin-bottom:48px">
+      <div class="footer-grid">
         <!-- Brand -->
         <div>
           <div style="display:flex;align-items:center;margin-bottom:16px">
@@ -88,6 +88,20 @@ function scrollTo(id) {
 </script>
 
 <style scoped>
+.footer-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 1fr;
+  gap: 40px;
+  margin-bottom: 48px;
+}
+
+@media (max-width: 900px) {
+  .footer-grid {
+    grid-template-columns: 1fr;
+    gap: 32px;
+  }
+}
+
 .footer-col-title { font-size:.78rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--amber-lt);margin-bottom:18px; }
 .footer-link { font-size:.88rem;color:rgba(253,246,227,.55);transition:color .2s;cursor:pointer; }
 .footer-link:hover { color:var(--amber-lt); }
