@@ -38,28 +38,39 @@ def stats():
     total_revenue  = db.session.query(func.coalesce(func.sum(Order.total), 0)).filter(
         Order.status != "cancelled"
     ).scalar()
-    pending        = Order.query.filter_by(status="pending").count()
-    delivered      = Order.query.filter_by(status="delivered").count()
+
+    # Status breakdown: single GROUP BY query instead of 6 queries
+    status_counts = {s: 0 for s in ORDER_STATUSES}
+    counts = db.session.query(Order.status, func.count(Order.id)).group_by(Order.status).all()
+    for s, count in counts:
+        if s in status_counts:
+            status_counts[s] = count
+
+    pending        = status_counts.get("pending", 0)
+    delivered      = status_counts.get("delivered", 0)
     total_users    = User.query.filter_by(role="user").count()
     total_products = Product.query.filter_by(active=True).count()
 
-    # Status breakdown
-    status_counts = {}
-    for s in ORDER_STATUSES:
-        status_counts[s] = Order.query.filter_by(status=s).count()
+    # Revenue last 7 days: single query for orders instead of 7 daily queries
+    seven_days_ago = datetime.utcnow().replace(hour=0, minute=0, second=0) - timedelta(days=6)
+    orders_last_7_days = db.session.query(Order.created_at, Order.total).filter(
+        Order.created_at >= seven_days_ago,
+        Order.status != "cancelled"
+    ).all()
 
-    # Revenue last 7 days
+    # Aggregate in Python
+    daily_revenue = { (datetime.utcnow().replace(hour=0, minute=0, second=0) - timedelta(days=i)).date(): 0.0 for i in range(7) }
+    for created_at, total in orders_last_7_days:
+        order_date = created_at.date()
+        if order_date in daily_revenue:
+            daily_revenue[order_date] += total
+
     revenue_chart = []
     for i in range(6, -1, -1):
-        day_start = datetime.utcnow().replace(hour=0, minute=0, second=0) - timedelta(days=i)
-        day_end   = day_start + timedelta(days=1)
-        rev = db.session.query(func.coalesce(func.sum(Order.total), 0)).filter(
-            Order.created_at >= day_start,
-            Order.created_at < day_end,
-            Order.status != "cancelled",
-        ).scalar()
+        day = datetime.utcnow().replace(hour=0, minute=0, second=0) - timedelta(days=i)
+        rev = daily_revenue.get(day.date(), 0.0)
         revenue_chart.append({
-            "date":    day_start.strftime("%d %b"),
+            "date":    day.strftime("%d %b"),
             "revenue": round(float(rev), 2),
         })
 
@@ -163,7 +174,7 @@ def update_product(pid):
 @require_admin
 def delete_product(pid):
     p = Product.query.get_or_404(pid)
-    p.active = False          # soft delete
+    db.session.delete(p)      # hard delete
     db.session.commit()
     safe_cache_clear()
     return jsonify({"success": True})
@@ -256,11 +267,11 @@ def update_order_status(oid):
     db.session.add(history)
     db.session.commit()
 
-    # Send status-update email (async)
+    # Send status-update email (async via thread/Celery)
     if order.email:
         try:
-            from tasks import send_status_update_task
-            send_status_update_task.delay(order.id, old_status, status)
+            from tasks import send_status_update_task, run_async_task
+            run_async_task(send_status_update_task, order.id, old_status, status)
         except Exception as exc:
             current_app.logger.warning(f"Email task failed: {exc}")
 

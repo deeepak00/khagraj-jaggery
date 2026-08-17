@@ -7,7 +7,7 @@
 
     <div v-if="loading" class="loader"><div class="spinner"></div></div>
 
-    <div v-else style="display:grid;grid-template-columns:1fr 1fr;gap:24px">
+    <div v-else class="admin-grid-2x1">
 
       <!-- Branding -->
       <div class="card">

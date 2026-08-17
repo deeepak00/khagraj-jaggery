@@ -241,11 +241,16 @@ class SiteSetting(db.Model):
 
     @classmethod
     def set_many(cls, data: dict):
+        if not data:
+            return
+        existing_rows = cls.query.filter(cls.key.in_(data.keys())).all()
+        existing_map = {row.key: row for row in existing_rows}
+        now = datetime.utcnow()
         for key, value in data.items():
-            row = cls.query.filter_by(key=key).first()
-            if row:
+            if key in existing_map:
+                row = existing_map[key]
                 row.value = str(value)
-                row.updated_at = datetime.utcnow()
+                row.updated_at = now
             else:
                 db.session.add(cls(key=key, value=str(value)))
         db.session.commit()

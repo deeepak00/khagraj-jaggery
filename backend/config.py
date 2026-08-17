@@ -40,10 +40,11 @@ class Config:
     MAIL_DEBUG            = False
 
     # ── Cache ─────────────────────────────────────────
-    # Use "RedisCache" in production when REDIS_URL is set
+    # Use "RedisCache" in production when REDIS_URL is set.
+    # Fallback to "NullCache" to prevent Gunicorn multi-worker consistency issues.
     _redis                = os.environ.get("REDIS_URL", "").strip()
     REDIS_URL             = _redis or "redis://localhost:6379/0"
-    CACHE_TYPE            = "RedisCache" if _redis else "SimpleCache"
+    CACHE_TYPE            = "RedisCache" if _redis else "NullCache"
     CACHE_DEFAULT_TIMEOUT = 300
     CACHE_REDIS_URL       = REDIS_URL
 

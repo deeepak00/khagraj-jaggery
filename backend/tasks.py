@@ -150,3 +150,25 @@ def send_status_update_task(order_id: int, old_status: str, new_status: str):
         mail.send(msg)
     except Exception as exc:
         print(f"[EMAIL ERROR] status update for {order.order_number}: {exc}")
+
+
+import threading
+from flask import current_app
+
+def run_async_task(task_func, *args, **kwargs):
+    """
+    Runs a task asynchronously. If Celery is running in eager mode (e.g. no Redis),
+    it spawns a background thread to execute the task without blocking the main thread.
+    Otherwise, it delegates to Celery .delay().
+    """
+    if current_app.config.get("CELERY_TASK_ALWAYS_EAGER"):
+        app = current_app._get_current_object()
+        def target():
+            with app.app_context():
+                try:
+                    task_func(*args, **kwargs)
+                except Exception as e:
+                    app.logger.error(f"Async thread task failed: {e}")
+        threading.Thread(target=target, daemon=True).start()
+    else:
+        task_func.delay(*args, **kwargs)

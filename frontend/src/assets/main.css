@@ -320,6 +320,9 @@ table.data-table { width: 100%; border-collapse: collapse; }
 .stat-card-label { font-size: .8rem; color: var(--text-lt); }
 .stat-card-icon { font-size: 2rem; }
 
+.admin-mobile-header { display: none; }
+.admin-grid-2x1 { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+
 /* ── FILTER TABS ────────────────────────────────────── */
 .filter-tabs { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 32px; justify-content: center; }
 .filter-tab { padding: 8px 22px; border-radius: 50px; border: 1.5px solid rgba(92,51,23,.2); background: transparent; color: var(--text-md); font-size: .88rem; font-weight: 500; cursor: pointer; transition: all .2s; }
@@ -441,8 +444,49 @@ table.data-table { width: 100%; border-collapse: collapse; }
   .section { padding: 64px 0; }
   .form-row { grid-template-columns: 1fr; }
   .stats-grid { grid-template-columns: 1fr 1fr; }
-  .admin-sidebar { display: none; }
-  .admin-content { margin-left: 0; padding: 20px; }
+  .admin-layout { padding-top: 138px !important; }
+  .admin-sidebar {
+    display: block !important;
+    position: fixed;
+    top: 138px;
+    left: 0;
+    width: 240px;
+    height: calc(100vh - 138px);
+    transform: translateX(-100%);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 150;
+    box-shadow: 4px 0 20px rgba(44,24,16,0.15);
+  }
+  .admin-sidebar.open {
+    transform: translateX(0);
+  }
+  .admin-content { margin-left: 0 !important; padding: 20px !important; min-height: calc(100vh - 138px) !important; }
+  .admin-grid-2x1 { grid-template-columns: 1fr; gap: 16px; }
+  .admin-mobile-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: fixed;
+    top: 88px;
+    left: 0;
+    right: 0;
+    height: 50px;
+    background: var(--brown);
+    color: var(--cream);
+    border-bottom: 1px solid rgba(200,136,42,.15);
+    padding: 0 20px;
+    z-index: 120;
+  }
+  .admin-sidebar-backdrop {
+    position: fixed;
+    top: 138px;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(44,24,16,0.4);
+    z-index: 140;
+    backdrop-filter: blur(2px);
+  }
   .cart-sidebar { width: 100vw; }
 
   .responsive-grid-3 {

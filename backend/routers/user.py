@@ -207,10 +207,10 @@ def place_order():
     # Invalidate product cache
     safe_cache_clear()
 
-    # Send confirmation email (async via Celery)
+    # Send confirmation email (async via thread/Celery)
     try:
-        from tasks import send_order_confirmation_task
-        send_order_confirmation_task.delay(order.id)
+        from tasks import send_order_confirmation_task, run_async_task
+        run_async_task(send_order_confirmation_task, order.id)
     except Exception:
         pass
 

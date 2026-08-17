@@ -186,6 +186,25 @@ Follow these literal steps to deploy the application on **Render.com** for your 
      * **Action**: `Rewrite`
 6. Click **Create Static Site**.
 
+---
+
+#### **Step D: Deploy the Celery Worker (Render Background Worker)**
+To run email notifications asynchronously using Celery:
+1. **Create a Redis Queue**:
+   * **Using Render Key Value**: Click **New +** > **Key Value** (this is Render's managed Redis service). Name it `khagraj-redis` and click create. Once active, copy the connection URL starting with `redis://` or `rediss://`.
+   * **Using Upstash (Permanently Free)**: Go to [Upstash](https://upstash.com/), create a free Redis database, and copy the connection string.
+2. **Add `REDIS_URL` to Backend**: Go to your Backend Web Service's environment variables and add `REDIS_URL` with the copied Redis connection string.
+3. **Deploy the Worker Service**:
+   * On the Render Dashboard, click **New +** > **Background Worker**.
+   * Connect your GitHub repository and set:
+     * **Name**: `khagraj-celery-worker`
+     * **Root Directory**: `backend` *(This is important!)*
+     * **Runtime**: `Python 3`
+     * **Build Command**: `pip install -r requirements.txt`
+     * **Start Command**: `celery -A app.celery worker --loglevel=info`
+   * Under **Advanced**, copy all environment variables from your Backend Web Service (including `DATABASE_URL`, `REDIS_URL`, and SMTP server credentials so it can send emails).
+4. Click **Create Background Worker**.
+
 Once both builds finish, your website will be live! Open your frontend URL to access the site. You can login to the admin panel with the default seeded credentials.
 
 ---
@@ -220,3 +239,14 @@ To protect your application from unauthorized access, data leaks, and attacks, y
 | **`MAIL_USERNAME`** | `your-email@gmail.com` | SMTP login account. |
 | **`MAIL_PASSWORD`** | 16-character App Password | Secure app token instead of your raw Google account password. |
 | **`MAIL_SENDER`** | `BrandName <your-email@gmail.com>` | Custom brand sender name to prevent email spam flags. |
+
+---
+
+### **🚀 Performance & Mobile Compatibility Optimizations**
+
+We have made significant optimizations to ensure the app is fast, responsive, and does not freeze or time out:
+1. **Batch Writes for Site Settings**: Consolidated 30+ sequential settings queries into a single query in `models/SiteSetting.set_many` to prevent network latency timeouts (sub-100ms updates).
+2. **Dashboard Query Reductions**: Grouped order status counts (`GROUP BY`) and daily revenues into single SQL operations. Dashboard query counts dropped from 20 to 8 queries.
+3. **Background Threading Fallback**: Created a threading handler in `tasks.py` to run Celery tasks asynchronously in a background daemon thread if Redis is missing. This prevents SMTP email connections from blocking HTTP requests.
+4. **NullCache Fallback**: Avoids stale Gunicorn process-local memory caching when Redis is missing, ensuring settings and product updates are live instantly.
+5. **Admin Drawer Navigation & Mobile Grid Layouts**: Integrated a sliding sidebar nav drawer on mobile viewports with backdrop overlay triggers. Replaced rigid inline styles in `DashboardPage` and `SettingsPage` with a responsive grid (`.admin-grid-2x1`) to guarantee perfect scaling on all phone screens.

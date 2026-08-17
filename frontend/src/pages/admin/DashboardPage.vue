@@ -17,7 +17,7 @@
         </div>
       </div>
 
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-bottom:24px">
+      <div class="admin-grid-2x1" style="margin-bottom:24px">
         <!-- Revenue Chart -->
         <div class="card">
           <div class="card-header"><h3>Revenue — Last 7 Days</h3></div>
@@ -48,7 +48,7 @@
         </div>
       </div>
 
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px">
+      <div class="admin-grid-2x1">
         <!-- Popular Products -->
         <div class="card">
           <div class="card-header">

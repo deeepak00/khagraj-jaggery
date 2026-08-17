@@ -266,12 +266,12 @@ async function toggleActive(p) {
 }
 
 async function confirmDelete(p) {
-  if (!confirm(`Hide "${p.name}" from the store?`)) return
+  if (!confirm(`Are you sure you want to permanently delete "${p.name}"?`)) return
   try {
     await adminApi.deleteProduct(p.id)
     const i = products.value.findIndex(x => x.id === p.id)
-    if (i > -1) products.value[i].active = false
-    toast.success('Product hidden')
+    if (i > -1) products.value.splice(i, 1)
+    toast.success('Product deleted successfully')
   } catch { toast.error('Delete failed') }
 }
 
