@@ -118,7 +118,7 @@
         <div>
           <div class="section-tag" style="color:var(--amber-lt);background:rgba(45,106,79,0.15);border-color:rgba(45,106,79,0.3)">Our Story</div>
           <h2 style="font-size:2.8rem;color:var(--cream);margin:16px 0 24px;font-family:'Playfair Display',serif;font-weight:700">{{ site.get('about_title') }}</h2>
-          <p style="color:rgba(243,248,252,0.8);font-size:1.05rem;line-height:1.75;margin-bottom:28px;font-family:'Lora',serif">{{ site.get('about_text') }}</p>
+          <p style="color:rgba(243,248,252,0.8);font-size:1.05rem;line-height:1.75;margin-bottom:28px;font-family:'Lora',serif;white-space:pre-wrap">{{ site.get('about_text') }}</p>
           
           <div style="display:flex;align-items:center;gap:18px;background:rgba(255,255,255,0.04);border-radius:16px;padding:20px;border:1px solid rgba(255,255,255,0.08)">
             <span style="font-size:2.5rem">🤝</span>
@@ -251,11 +251,11 @@
             <h2 class="section-title" style="text-align:left;margin-top:16px">Let's Connect</h2>
             <p class="section-subtitle" style="text-align:left;margin-bottom:40px">Have questions about bulk orders, customization or shipping? Send us a message.</p>
 
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px">
+            <div class="contact-info-grid">
               <div v-for="c in contactItems" :key="c.label" style="background:var(--white);padding:20px;border-radius:16px;box-shadow:0 6px 16px rgba(45,106,79,0.02);border:1px solid rgba(45,106,79,0.04)">
                 <div style="font-size:1.6rem;margin-bottom:8px">{{ c.icon }}</div>
                 <div style="font-size:.72rem;color:var(--text-lt);text-transform:uppercase;letter-spacing:.05em;font-weight:600">{{ c.label }}</div>
-                <div style="font-family:'Lora',serif;color:var(--text-md);margin-top:2px;font-size:.9rem;font-weight:500">{{ c.val }}</div>
+                <div style="font-family:'Lora',serif;color:var(--text-md);margin-top:2px;font-size:.9rem;font-weight:500;word-break:break-word">{{ c.val }}</div>
               </div>
             </div>
           </div>

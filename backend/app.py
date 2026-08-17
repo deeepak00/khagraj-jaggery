@@ -168,41 +168,6 @@ def _seed(app: Flask):
         if not row:
             db.session.add(SiteSetting(key=key, value=value))
 
-    # Sample products
-    if Product.query.count() == 0:
-        sample = [
-            ("Pure Sugarcane Jaggery Block",
-             "Traditional hand-crafted jaggery blocks made from fresh sugarcane juice. Rich in minerals, unrefined and natural.",
-             80, "kg", "sugarcane", "Bestseller", "/uploads/default_product.png", 200, True),
-            ("Organic Jaggery Powder",
-             "Fine-ground organic jaggery powder — easy to dissolve in tea, coffee, or desserts. 100% chemical-free.",
-             120, "kg", "sugarcane", "Organic", "/uploads/default_product.png", 150, False),
-            ("Palm Jaggery (Karupatti)",
-             "Handmade from natural palm sap. Dark, rich and packed with antioxidants.",
-             200, "kg", "palm", "Premium", "/uploads/default_product.png", 80, True),
-            ("Jaggery Cubes",
-             "Perfectly portioned jaggery cubes — convenient for chai, sweets and cooking.",
-             100, "kg", "sugarcane", None, "/uploads/default_product.png", 180, False),
-            ("Ginger Jaggery",
-             "Pure jaggery infused with real ginger extract. Great for immunity and digestion.",
-             150, "kg", "flavored", "New", "/uploads/default_product.png", 60, False),
-            ("Cardamom Jaggery",
-             "Aromatic jaggery blended with premium cardamom. Elevates your desserts and chai.",
-             160, "kg", "flavored", "New", "/uploads/default_product.png", 60, False),
-            ("Coconut Jaggery",
-             "Made from coconut palm nectar — rare, with a distinct caramel-like flavour.",
-             220, "kg", "palm", "Rare", "/uploads/default_product.png", 40, True),
-            ("Jaggery Syrup (Paagu)",
-             "Liquid jaggery syrup — ideal for pancakes, desserts, and direct use.",
-             130, "500ml", "sugarcane", None, "/uploads/default_product.png", 90, False),
-        ]
-        for name, desc, price, unit, cat, badge, img, stock, featured in sample:
-            db.session.add(Product(
-                name=name, description=desc, price=price, unit=unit,
-                category=cat, badge=badge, image_url=img,
-                stock=stock, featured=featured, active=True
-            ))
-
     db.session.commit()
 
 
