@@ -7,7 +7,7 @@
       <div style="position:absolute;bottom:10%;left:35%;width:250px;height:250px;background:rgba(224,159,27,0.04);border-radius:50%;filter:blur(60px);pointer-events:none"></div>
 
       <!-- Left side subtle background watermark -->
-      <div style="position:absolute;top:66%;left:-17%;transform:translateY(-50%);width:120%;max-width:1450px;opacity:0.3;pointer-events:none;z-index:1">
+      <div class="hide-mobile" style="position:absolute;top:66%;left:-17%;transform:translateY(-50%);width:120%;max-width:1450px;opacity:0.3;pointer-events:none;z-index:1">
         <img :src="'/uploads/hero_bg_left.png'" style="width:100%;height:auto;object-fit:contain" />
       </div>
 
@@ -29,7 +29,7 @@
         <div style="max-width:580px;display:flex;flex-direction:column;align-items:center;text-align:center">
           <!-- Hero badge logo -->
           <div style="margin-bottom:32px;display:flex;justify-content:center">
-            <img :src="'/uploads/hero_badge.png'" alt="Sugarcane Fields Logo" style="height:400px;width:auto;object-fit:contain;margin-top:-25px" />
+            <img :src="'/uploads/hero_badge.png'" alt="Sugarcane Fields Logo" style="max-height:300px;max-width:100%;width:auto;object-fit:contain;margin-top:-25px" />
           </div>
           <!-- Brand storytelling quote block -->
           <div style="margin-top:16px;position:relative;max-width:540px">
@@ -112,7 +112,7 @@
     <!-- OUR STORY & LAL JI FOODS BACKING -->
     <section class="section" style="background:var(--brown);color:var(--cream);position:relative;overflow:hidden" id="about">
       <!-- Decoration element -->
-      <div style="position:absolute;bottom:-10%;left:-5%;width:300px;height:300px;background:rgba(255,255,255,0.02);border-radius:50%;filter:blur(50px)"></div>
+      <div class="hide-mobile" style="position:absolute;bottom:-10%;left:-5%;width:300px;height:300px;background:rgba(255,255,255,0.02);border-radius:50%;filter:blur(50px)"></div>
 
       <div class="container story-grid">
         <div>

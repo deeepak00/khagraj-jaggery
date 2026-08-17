@@ -322,6 +322,8 @@ table.data-table { width: 100%; border-collapse: collapse; }
 
 .admin-mobile-header { display: none; }
 .admin-grid-2x1 { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+.admin-mobile-only { display: none; }
+.admin-desktop-only { display: block; }
 
 /* ── FILTER TABS ────────────────────────────────────── */
 .filter-tabs { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 32px; justify-content: center; }
@@ -507,5 +509,14 @@ table.data-table { width: 100%; border-collapse: collapse; }
   }
   .mobile-menu-toggle {
     display: flex;
+  }
+  .admin-mobile-only {
+    display: block !important;
+  }
+  .admin-desktop-only {
+    display: none !important;
+  }
+  .hide-mobile {
+    display: none !important;
   }
 }

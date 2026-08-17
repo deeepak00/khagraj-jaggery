@@ -18,47 +18,91 @@
       </select>
     </div>
 
-    <div class="card" style="overflow:hidden">
-      <div v-if="loading" class="loader"><div class="spinner"></div></div>
-      <div class="table-wrap" v-else>
-        <table class="data-table">
-          <thead>
-            <tr><th style="width:60px">Image</th><th>Name</th><th>Category</th><th>Price</th><th>Stock</th><th>Status</th><th>Featured</th><th>Actions</th></tr>
-          </thead>
-          <tbody>
-            <tr v-for="p in filtered" :key="p.id">
-              <td>
-                <div style="width:48px;height:48px;border-radius:8px;overflow:hidden;background:var(--cream2)">
-                  <img v-if="p.image_url" :src="p.image_url" :alt="p.name" style="width:100%;height:100%;object-fit:cover"/>
-                  <div v-else style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:1.4rem">🍯</div>
-                </div>
-              </td>
-              <td>
-                <div style="font-weight:600;color:var(--brown)">{{ p.name }}</div>
-                <span v-if="p.badge" style="font-size:.68rem;background:var(--amber);color:var(--white);padding:2px 8px;border-radius:50px">{{ p.badge }}</span>
-              </td>
-              <td style="text-transform:capitalize;font-size:.85rem">{{ p.category }}</td>
-              <td><strong>₹{{ p.price }}</strong><span style="font-size:.75rem;color:var(--text-lt)"> /{{ p.unit }}</span></td>
-              <td>
-                <span :style="`font-size:.82rem;font-weight:600;color:${p.stock>20?'var(--green)':'var(--red)'}`">{{ p.stock }} units</span>
-              </td>
-              <td><span class="badge" :class="p.active?'badge-active':'badge-inactive'">{{ p.active ? 'Active' : 'Inactive' }}</span></td>
-              <td>
-                <span v-if="p.featured" style="color:var(--gold);font-size:1.1rem">⭐</span>
-                <span v-else style="color:var(--text-lt);font-size:.8rem">—</span>
-              </td>
-              <td>
-                <div style="display:flex;gap:6px">
-                  <button class="btn btn-primary btn-sm" @click="openEdit(p)">Edit</button>
-                  <button class="btn btn-ghost btn-sm" @click="toggleActive(p)">{{ p.active ? 'Hide' : 'Show' }}</button>
-                  <button class="btn btn-danger btn-sm" @click="confirmDelete(p)">Del</button>
-                </div>
-              </td>
-            </tr>
-          </tbody>
-        </table>
+    <div v-if="loading" class="loader"><div class="spinner"></div></div>
+    <template v-else>
+      <!-- Desktop Table View -->
+      <div class="card admin-desktop-only" style="overflow:hidden">
+        <div class="table-wrap">
+          <table class="data-table">
+            <thead>
+              <tr><th style="width:60px">Image</th><th>Name</th><th>Category</th><th>Price</th><th>Stock</th><th>Status</th><th>Featured</th><th>Actions</th></tr>
+            </thead>
+            <tbody>
+              <tr v-for="p in filtered" :key="p.id">
+                <td>
+                  <div style="width:48px;height:48px;border-radius:8px;overflow:hidden;background:var(--cream2)">
+                    <img v-if="p.image_url" :src="p.image_url" :alt="p.name" style="width:100%;height:100%;object-fit:cover"/>
+                    <div v-else style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:1.4rem">🍯</div>
+                  </div>
+                </td>
+                <td>
+                  <div style="font-weight:600;color:var(--brown)">{{ p.name }}</div>
+                  <span v-if="p.badge" style="font-size:.68rem;background:var(--amber);color:var(--white);padding:2px 8px;border-radius:50px">{{ p.badge }}</span>
+                </td>
+                <td style="text-transform:capitalize;font-size:.85rem">{{ p.category }}</td>
+                <td><strong>₹{{ p.price }}</strong><span style="font-size:.75rem;color:var(--text-lt)"> /{{ p.unit }}</span></td>
+                <td>
+                  <span :style="`font-size:.82rem;font-weight:600;color:${p.stock>20?'var(--green)':'var(--red)'}`">{{ p.stock }} units</span>
+                </td>
+                <td><span class="badge" :class="p.active?'badge-active':'badge-inactive'">{{ p.active ? 'Active' : 'Inactive' }}</span></td>
+                <td>
+                  <span v-if="p.featured" style="color:var(--gold);font-size:1.1rem">⭐</span>
+                  <span v-else style="color:var(--text-lt);font-size:.8rem">—</span>
+                </td>
+                <td>
+                  <div style="display:flex;gap:6px">
+                    <button class="btn btn-primary btn-sm" @click="openEdit(p)">Edit</button>
+                    <button class="btn btn-ghost btn-sm" @click="toggleActive(p)">{{ p.active ? 'Hide' : 'Show' }}</button>
+                    <button class="btn btn-danger btn-sm" @click="confirmDelete(p)">Del</button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </div>
-    </div>
+
+      <!-- Mobile Card List View -->
+      <div class="admin-mobile-only">
+        <div v-if="!filtered.length" style="text-align:center;padding:40px;color:var(--text-lt)">No products found.</div>
+        <div v-else style="display:grid;gap:16px">
+          <div v-for="p in filtered" :key="p.id" class="card" style="padding:16px;display:flex;flex-direction:column;gap:12px">
+            <div style="display:flex;gap:12px;align-items:center">
+              <div style="width:60px;height:60px;border-radius:8px;overflow:hidden;background:var(--cream2);flex-shrink:0">
+                <img v-if="p.image_url" :src="p.image_url" :alt="p.name" style="width:100%;height:100%;object-fit:cover"/>
+                <div v-else style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:1.6rem">🍯</div>
+              </div>
+              <div style="flex:1">
+                <div style="font-weight:600;color:var(--brown);font-size:1rem">{{ p.name }}</div>
+                <div style="display:flex;gap:6px;align-items:center;margin-top:4px;flex-wrap:wrap">
+                  <span style="font-size:.72rem;background:var(--cream2);color:var(--brown);padding:2px 8px;border-radius:4px;text-transform:capitalize">{{ p.category }}</span>
+                  <span v-if="p.badge" style="font-size:.68rem;background:var(--amber);color:var(--white);padding:2px 8px;border-radius:50px">{{ p.badge }}</span>
+                  <span v-if="p.featured" style="color:var(--gold);font-size:.8rem">⭐ Featured</span>
+                </div>
+              </div>
+            </div>
+            <div style="display:flex;justify-content:space-between;border-top:1px dashed rgba(200,136,42,.15);padding-top:10px;font-size:.85rem">
+              <div>
+                <span style="color:var(--text-lt)">Price:</span>
+                <strong style="color:var(--brown)"> ₹{{ p.price }}</strong><span style="font-size:.75rem;color:var(--text-lt)">/{{ p.unit }}</span>
+              </div>
+              <div>
+                <span style="color:var(--text-lt)">Stock:</span>
+                <span :style="`font-weight:600;color:${p.stock>20?'var(--green)':'var(--red)'}`">{{ p.stock }} units</span>
+              </div>
+              <div>
+                <span class="badge" :class="p.active?'badge-active':'badge-inactive'">{{ p.active ? 'Active' : 'Inactive' }}</span>
+              </div>
+            </div>
+            <div style="display:flex;gap:8px;justify-content:flex-end;border-top:1px dashed rgba(200,136,42,.15);padding-top:10px">
+              <button class="btn btn-primary btn-sm" @click="openEdit(p)">Edit</button>
+              <button class="btn btn-ghost btn-sm" @click="toggleActive(p)">{{ p.active ? 'Hide' : 'Show' }}</button>
+              <button class="btn btn-danger btn-sm" @click="confirmDelete(p)">Del</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </template>
 
     <!-- Product Modal -->
     <teleport to="body">

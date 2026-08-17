@@ -17,40 +17,63 @@
       </div>
     </div>
 
-    <div class="card" style="overflow:hidden">
-      <div v-if="loading" class="loader"><div class="spinner"></div></div>
-      <div class="table-wrap" v-else>
-        <table class="data-table">
-          <thead>
-            <tr><th>Order #</th><th>Customer</th><th>Date</th><th>Items</th><th>Total</th><th>Status</th><th>Action</th></tr>
-          </thead>
-          <tbody>
-            <tr v-if="!orders.length">
-              <td colspan="7" style="text-align:center;padding:40px;color:var(--text-lt)">No orders found.</td>
-            </tr>
-            <tr v-for="o in orders" :key="o.id">
-              <td><strong style="color:var(--amber);font-size:.82rem">{{ o.order_number }}</strong></td>
-              <td>
-                <div style="font-weight:500;color:var(--brown)">{{ o.customer_name }}</div>
-                <div style="font-size:.75rem;color:var(--text-lt)">{{ o.phone }}</div>
-              </td>
-              <td style="font-size:.82rem">{{ fmtDate(o.created_at) }}</td>
-              <td style="font-size:.82rem;color:var(--text-md)">{{ o.items.length }} item(s)</td>
-              <td><strong>₹{{ o.total?.toFixed(0) }}</strong></td>
-              <td><span class="badge" :class="`badge-${o.status}`">{{ o.status }}</span></td>
-              <td><button class="btn btn-primary btn-sm" @click="openDetail(o)">View & Update</button></td>
-            </tr>
-          </tbody>
-        </table>
+    <div v-if="loading" class="loader"><div class="spinner"></div></div>
+    <template v-else>
+      <!-- Desktop Table View -->
+      <div class="card admin-desktop-only" style="overflow:hidden">
+        <div class="table-wrap">
+          <table class="data-table">
+            <thead>
+              <tr><th>Order #</th><th>Customer</th><th>Date</th><th>Items</th><th>Total</th><th>Status</th><th>Action</th></tr>
+            </thead>
+            <tbody>
+              <tr v-if="!orders.length">
+                <td colspan="7" style="text-align:center;padding:40px;color:var(--text-lt)">No orders found.</td>
+              </tr>
+              <tr v-for="o in orders" :key="o.id">
+                <td><strong style="color:var(--amber);font-size:.82rem">{{ o.order_number }}</strong></td>
+                <td>
+                  <div style="font-weight:500;color:var(--brown)">{{ o.customer_name }}</div>
+                  <div style="font-size:.75rem;color:var(--text-lt)">{{ o.phone }}</div>
+                </td>
+                <td style="font-size:.82rem">{{ fmtDate(o.created_at) }}</td>
+                <td style="font-size:.82rem;color:var(--text-md)">{{ o.items.length }} item(s)</td>
+                <td><strong>₹{{ o.total?.toFixed(0) }}</strong></td>
+                <td><span class="badge" :class="`badge-${o.status}`">{{ o.status }}</span></td>
+                <td><button class="btn btn-primary btn-sm" @click="openDetail(o)">View & Update</button></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </div>
 
-      <!-- Pagination -->
-      <div v-if="totalPages > 1" style="padding:16px 20px;border-top:1px solid rgba(200,136,42,.1);display:flex;gap:8px;justify-content:flex-end;align-items:center">
+      <!-- Mobile Card List View -->
+      <div class="admin-mobile-only">
+        <div v-if="!orders.length" style="text-align:center;padding:40px;color:var(--text-lt)">No orders found.</div>
+        <div v-else style="display:grid;gap:16px">
+          <div v-for="o in orders" :key="o.id" class="card" style="padding:16px;display:flex;flex-direction:column;gap:12px">
+            <div style="display:flex;justify-content:space-between;align-items:center">
+              <strong style="color:var(--amber);font-size:.9rem">{{ o.order_number }}</strong>
+              <span class="badge" :class="`badge-${o.status}`">{{ o.status }}</span>
+            </div>
+            <div style="font-size:.85rem;color:var(--text-md);display:grid;gap:4px">
+              <div>👤 <strong>{{ o.customer_name }}</strong> ({{ o.phone }})</div>
+              <div style="color:var(--text-lt)">📅 {{ fmtDate(o.created_at) }} &nbsp;|&nbsp; 📦 {{ o.items.length }} item(s)</div>
+              <div style="font-size:.95rem;margin-top:4px">Total: <strong style="color:var(--brown)">₹{{ o.total?.toFixed(0) }}</strong></div>
+            </div>
+            <div style="display:flex;justify-content:flex-end;border-top:1px dashed rgba(200,136,42,.15);padding-top:10px">
+              <button class="btn btn-primary btn-sm" @click="openDetail(o)">View & Update</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Pagination (works for both views) -->
+      <div v-if="totalPages > 1" style="margin-top:20px;display:flex;gap:8px;justify-content:flex-end;align-items:center">
         <button class="btn btn-ghost btn-sm" :disabled="page===1" @click="page--;load()">← Prev</button>
         <span style="font-size:.85rem;color:var(--text-md)">{{ page }} / {{ totalPages }}</span>
         <button class="btn btn-ghost btn-sm" :disabled="page===totalPages" @click="page++;load()">Next →</button>
       </div>
-    </div>
 
     <!-- Order Detail Modal -->
     <teleport to="body">

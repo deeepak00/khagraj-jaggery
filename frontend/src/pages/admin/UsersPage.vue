@@ -9,46 +9,79 @@
       <input class="form-control" v-model="search" placeholder="Search by name or email..." style="max-width:300px" @input="debouncedLoad"/>
     </div>
 
-    <div class="card" style="overflow:hidden">
-      <div v-if="loading" class="loader"><div class="spinner"></div></div>
-      <div class="table-wrap" v-else>
-        <table class="data-table">
-          <thead>
-            <tr><th>Name</th><th>Email</th><th>Phone</th><th>Role</th><th>Status</th><th>Joined</th><th>Action</th></tr>
-          </thead>
-          <tbody>
-            <tr v-if="!users.length">
-              <td colspan="7" style="text-align:center;padding:40px;color:var(--text-lt)">No users found.</td>
-            </tr>
-            <tr v-for="u in users" :key="u.id">
-              <td>
-                <div style="display:flex;align-items:center;gap:10px">
-                  <div style="width:36px;height:36px;border-radius:50%;background:var(--cream2);display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0">
-                    {{ u.name?.[0]?.toUpperCase() || '?' }}
+    <div v-if="loading" class="loader"><div class="spinner"></div></div>
+    <template v-else>
+      <!-- Desktop Table View -->
+      <div class="card admin-desktop-only" style="overflow:hidden">
+        <div class="table-wrap">
+          <table class="data-table">
+            <thead>
+              <tr><th>Name</th><th>Email</th><th>Phone</th><th>Role</th><th>Status</th><th>Joined</th><th>Action</th></tr>
+            </thead>
+            <tbody>
+              <tr v-if="!users.length">
+                <td colspan="7" style="text-align:center;padding:40px;color:var(--text-lt)">No users found.</td>
+              </tr>
+              <tr v-for="u in users" :key="u.id">
+                <td>
+                  <div style="display:flex;align-items:center;gap:10px">
+                    <div style="width:36px;height:36px;border-radius:50%;background:var(--cream2);display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0">
+                      {{ u.name?.[0]?.toUpperCase() || '?' }}
+                    </div>
+                    <div>
+                      <div style="font-weight:500;color:var(--brown)">{{ u.name }}</div>
+                    </div>
                   </div>
-                  <div>
-                    <div style="font-weight:500;color:var(--brown)">{{ u.name }}</div>
+                </td>
+                <td style="font-size:.85rem">{{ u.email }}</td>
+                <td style="font-size:.85rem;color:var(--text-lt)">{{ u.phone || '—' }}</td>
+                <td><span class="badge" :class="`badge-${u.role}`">{{ u.role }}</span></td>
+                <td><span class="badge" :class="u.is_active?'badge-active':'badge-inactive'">{{ u.is_active ? 'Active' : 'Inactive' }}</span></td>
+                <td style="font-size:.82rem;color:var(--text-lt)">{{ fmtDate(u.created_at) }}</td>
+                <td>
+                  <div style="display:flex;gap:6px">
+                    <button v-if="u.role !== 'admin'" class="btn btn-ghost btn-sm" @click="toggleActive(u)">
+                      {{ u.is_active ? 'Deactivate' : 'Activate' }}
+                    </button>
+                    <span v-else style="font-size:.78rem;color:var(--text-lt)">Super Admin</span>
                   </div>
-                </div>
-              </td>
-              <td style="font-size:.85rem">{{ u.email }}</td>
-              <td style="font-size:.85rem;color:var(--text-lt)">{{ u.phone || '—' }}</td>
-              <td><span class="badge" :class="`badge-${u.role}`">{{ u.role }}</span></td>
-              <td><span class="badge" :class="u.is_active?'badge-active':'badge-inactive'">{{ u.is_active ? 'Active' : 'Inactive' }}</span></td>
-              <td style="font-size:.82rem;color:var(--text-lt)">{{ fmtDate(u.created_at) }}</td>
-              <td>
-                <div style="display:flex;gap:6px">
-                  <button v-if="u.role !== 'admin'" class="btn btn-ghost btn-sm" @click="toggleActive(u)">
-                    {{ u.is_active ? 'Deactivate' : 'Activate' }}
-                  </button>
-                  <span v-else style="font-size:.78rem;color:var(--text-lt)">Super Admin</span>
-                </div>
-              </td>
-            </tr>
-          </tbody>
-        </table>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </div>
-    </div>
+
+      <!-- Mobile Card List View -->
+      <div class="admin-mobile-only">
+        <div v-if="!users.length" style="text-align:center;padding:40px;color:var(--text-lt)">No users found.</div>
+        <div v-else style="display:grid;gap:16px">
+          <div v-for="u in users" :key="u.id" class="card" style="padding:16px;display:flex;flex-direction:column;gap:12px">
+            <div style="display:flex;gap:12px;align-items:center">
+              <div style="width:40px;height:40px;border-radius:50%;background:var(--cream2);display:flex;align-items:center;justify-content:center;font-size:1.1rem;font-weight:bold;color:var(--brown);flex-shrink:0">
+                {{ u.name?.[0]?.toUpperCase() || '?' }}
+              </div>
+              <div style="flex:1">
+                <div style="font-weight:600;color:var(--brown)">{{ u.name }}</div>
+                <div style="font-size:.78rem;color:var(--text-lt)">{{ u.email }}</div>
+              </div>
+            </div>
+            <div style="display:flex;justify-content:space-between;border-top:1px dashed rgba(200,136,42,.15);padding-top:10px;font-size:.82rem">
+              <div>📞 {{ u.phone || 'No phone' }}</div>
+              <div style="display:flex;gap:6px">
+                <span class="badge" :class="`badge-${u.role}`">{{ u.role }}</span>
+                <span class="badge" :class="u.is_active?'badge-active':'badge-inactive'">{{ u.is_active ? 'Active' : 'Inactive' }}</span>
+              </div>
+            </div>
+            <div v-if="u.role !== 'admin'" style="display:flex;justify-content:flex-end;border-top:1px dashed rgba(200,136,42,.15);padding-top:10px">
+              <button class="btn btn-ghost btn-sm" @click="toggleActive(u)">
+                {{ u.is_active ? 'Deactivate' : 'Activate' }}
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </template>
   </div>
 </template>
 
