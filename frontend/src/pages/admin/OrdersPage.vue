@@ -74,6 +74,7 @@
         <span style="font-size:.85rem;color:var(--text-md)">{{ page }} / {{ totalPages }}</span>
         <button class="btn btn-ghost btn-sm" :disabled="page===totalPages" @click="page++;load()">Next →</button>
       </div>
+    </template>
 
     <!-- Order Detail Modal -->
     <teleport to="body">
